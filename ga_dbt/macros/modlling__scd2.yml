@@ -1,0 +1,24 @@
+version: 2
+
+macros:
+  - name: modelling__scd2
+    description: >
+      A macro to implement Slowly Changing Dimension Type 2 (SCD2) logic on a given relation.
+      Applies SCD logic based on provided keys, timestamps, and tracked attributes.
+    arguments:
+      - name: relation
+        description: The source relation to apply SCD2 logic on.
+      - name: business_unique_key
+        description: List of columns that uniquely identify a business entity.
+      - name: time_tracking_column
+        description: Timestamp column that indicates when the row was last updated.
+      - name: scd_2_tracked_attributes
+        description: Columns tracked with SCD Type 2 — create new row on change.
+      - name: scd_1_tracked_attributes
+        description: Columns tracked with SCD Type 1 — overwrite existing value.
+      - name: filter_expression
+        description: Optional SQL WHERE clause to filter source data.
+      - name: configure_materialization
+        description: Boolean flag to configure the model as incremental with merge.
+      - name: sk_alias
+        description: Name to use for the generated surrogate key column (default is `scd_sk`).

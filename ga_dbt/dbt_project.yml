@@ -1,0 +1,54 @@
+
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'ga_dbt'
+version: '1.0.0'
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'ga_dbt'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+models:
+  ga_dbt:
+    stg:
+      +materialized: view
+      +schema: stg
+      +docs:
+        node_color: "blue"
+    int:
+      +materialized: table
+      +schema: int
+      +docs:
+        node_color: "green"
+    warehouse:
+      +materialized: table
+      +schema: warehouse
+      +constraints: true
+      +contract:
+        enforced: true
+      +on_schema_change: append_new_columns
+      +docs:
+        node_color: "brown"
+
+    macro_tests:
+      +schema: fixtures_and_tests

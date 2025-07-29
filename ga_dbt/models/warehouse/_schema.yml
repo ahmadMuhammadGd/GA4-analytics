@@ -1,0 +1,305 @@
+
+models:
+
+  - name: dim_user
+    columns: 
+      - name: user_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: user_pseudo_id
+        data_type: text
+      - name: user_first_touch_timestamp
+        data_type: timestamp
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: dim_geo
+    columns: 
+      - name: geo_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: continent
+        data_type: text
+      - name: sub_continent
+        data_type: text
+      - name: region
+        data_type: text
+      - name: country
+        data_type: text
+      - name: city
+        data_type: text
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: dim_source
+    columns: 
+      - name: source_sk 
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: source
+        data_type: text
+      - name: medium
+        data_type: text
+      - name: name
+        data_type: text
+      - name: campaign
+        data_type: text
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: dim_device
+    columns: 
+      - name: device_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: category
+        data_type: text
+      - name: os
+        data_type: text
+      - name: os_version
+        data_type: text
+      - name: brand
+        data_type: text
+      - name: model
+        data_type: text
+      - name: language
+        data_type: text
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: dim_browser
+    columns: 
+      - name: browser_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: name 
+        data_type: text
+      - name: version 
+        data_type: text
+      - name: created_at 
+        data_type: timestamp
+
+
+  - name: dim_category
+    columns: 
+      - name: category_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: name
+        data_type: text
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: dim_item
+    columns: 
+      - name: item_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: item_id
+        data_type: text
+      - name: item_name
+        data_type: text
+      - name: item_brand
+        data_type: text
+      - name: price
+        data_type: float
+      - name: price_in_usd
+        data_type: float
+      - name: scd_effective_from
+        data_type: timestamp
+      - name: scd_effective_to
+        data_type: timestamp
+      - name: scd_is_effective
+        data_type: boolean
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: bridge_item_category
+    columns: 
+      - name: item_sk
+        data_type: text  
+        constraints:
+          - type: foreign_key
+            to: ref('dim_item')
+            to_columns: [item_sk]
+      - name: category_sk
+        data_type: text  
+        constraints:
+          - type: foreign_key
+            to: ref('dim_category')
+            to_columns: [category_sk]
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: dim_page
+    columns: 
+      - name: page_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: title
+        data_type: text
+      - name: url
+        data_type: text
+      - name: scd_effective_from
+        data_type: timestamp
+      - name: scd_effective_to
+        data_type: timestamp
+      - name: scd_is_effective
+        data_type: boolean
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: dim_event_type
+    columns: 
+      - name: event_type_sk
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: event_name
+        data_type: text
+      - name: description
+        data_type: text
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: fct_event
+    columns: 
+      - name: event_sk
+        data_type: text
+        constraints:
+          - type: primary_key
+      - name: user_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_user')
+            to_columns: [user_sk]
+      - name: session_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('fct_session')
+            to_columns: [session_sk]
+      - name: event_type_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_event_type')
+            to_columns: [event_type_sk]
+      - name: source_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_source')
+            to_columns: [source_sk]
+      - name: occurred_at
+        data_type: timestamp
+      - name: engagement_time_ms
+        data_type: float
+      - name: value_usd
+        data_type: float
+      - name: revenue_usd
+        data_type: float
+      - name: page_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_page')
+            to_columns: [page_sk]
+      - name: referral_page_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_page')
+            to_columns: [page_sk]
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: fct_event_item
+    constraints:
+      - type: primary_key
+        columns: [item_sk, event_sk]
+    columns: 
+      - name: item_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_item')
+            to_column: [item_sk]
+      - name: event_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('fct_event')
+            to_column: [event_sk]
+      - name: qty
+        data_type: int
+      - name: created_at
+        data_type: timestamp
+
+
+  - name: fct_session
+    columns: 
+      - name: session_sk 
+        data_type: text 
+        constraints:
+          - type: primary_key
+      - name: ga_session_id
+        data_type: text
+      - name: user_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_user')
+            to_column: [user_sk]
+      - name: geo_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_geo')
+            to_column: [geo_sk]
+      - name: device_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_device')
+            to_column: [device_sk]
+      - name: browser_sk
+        data_type: text 
+        constraints:
+          - type: foreign_key
+            to: ref('dim_browser')
+            to_column: [browser_sk]
+      - name: engaged_session_event
+        data_type: boolean
+      - name: ga_session_number
+        data_type: int
+      - name: started_at
+        data_type: timestamp
+      - name: ended_at
+        description: only exists with engaged sessions
+        data_type: timestamp
+      - name: total_duration_s
+        data_type: float
+      - name: total_duration_m
+        data_type: float
+      - name: created_at
+        data_type: timestamp
