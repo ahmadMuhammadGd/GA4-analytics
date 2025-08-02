@@ -32,16 +32,16 @@ if __name__ == '__main__':
         table_name = Path(template).stem
         
         target_sql_file = target_directory  / f'{Path(__file__).stem}.sql'
-        with open(target_sql_file, 'w') as f:
-            f.write(sql)
     
         try:
             postgres_connector.sink_data(
                 connector=bigquery_connector,
                 sql_text=sql,
                 table_name=table_name, 
-                schema='raw_stg'
+                schema='raw_stg',
+                incremental_column='event_timestamp',
+                target_sql_file = target_sql_file
             )
+        
         except Exception as e:
             raise Exception(f"{e}\n\nCheck target sql file at => {target_sql_file}")
-        

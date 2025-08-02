@@ -24,6 +24,6 @@ select
     to_json_string({{ column }}) as {{column}}_json,
     {% endfor %}
     -- Metadata
-    current_timestamp::timestamp as utc_ingestion_timestamp
+    cast(current_timestamp as timestamp) as utc_ingestion_timestamp
 from
-    cte_source;
+    cte_source

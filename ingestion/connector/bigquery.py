@@ -9,3 +9,6 @@ class BigQuery(Connector):
     
     def source_data(self, sql:str):
         return self.client.query_and_wait(sql).to_dataframe()
+    
+    def sink_data(self, df, table_name, **kwargs):
+        raise NotImplementedError(f"this function hasn't been implemented yet")
