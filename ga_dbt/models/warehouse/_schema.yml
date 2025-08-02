@@ -127,7 +127,7 @@ models:
         data_type: timestamp
 
 
-  - name: bridge_item_category
+  - name: dim_item_category
     columns: 
       - name: item_sk
         data_type: text  
@@ -165,7 +165,7 @@ models:
         data_type: timestamp
 
 
-  - name: dim_event_type
+  - name: dim_event
     columns: 
       - name: event_type_sk
         data_type: text 
@@ -175,6 +175,8 @@ models:
         data_type: text
       - name: description
         data_type: text
+      - name: is_key_event
+        data_type: boolean
       - name: created_at
         data_type: timestamp
 
@@ -201,7 +203,7 @@ models:
         data_type: text 
         constraints:
           - type: foreign_key
-            to: ref('dim_event_type')
+            to: ref('dim_event')
             to_columns: [event_type_sk]
       - name: source_sk
         data_type: text 
@@ -209,7 +211,7 @@ models:
           - type: foreign_key
             to: ref('dim_source')
             to_columns: [source_sk]
-      - name: occurred_at
+      - name: event_timestamp
         data_type: timestamp
       - name: engagement_time_ms
         data_type: float
@@ -250,8 +252,10 @@ models:
           - type: foreign_key
             to: ref('fct_event')
             to_column: [event_sk]
-      - name: qty
+      - name: quantity
         data_type: int
+      - name: price
+        data_type: DECIMAL(10, 2)
       - name: created_at
         data_type: timestamp
 

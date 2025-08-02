@@ -1,15 +1,21 @@
-with cte_source as (
-    select distinct 
-        item_item_category
-    from {{ ref("int_ga_events") }}
+with unnested_categories as (
+    select 
+        item_name, lower(trim(cat)) as item_category
+    from {{ ref("int_ga_items_flatten") }},
+    unnest(item_category) as cat
+    where cat is not null and trim(cat) != ''
 )
 ,
-cte_unnested as (
+cte_historical_item_category as (
     select distinct
-        lower(trim(unnest(item_item_category))) as unn_item_category 
-    from cte_source
+        di.item_sk as item_sk,
+        dc.category_sk as category_sk
+    from unnested_categories uc
+    left join {{ ref('dim_category') }} dc on uc.item_category = dc.name
+    left join {{ ref('dim_item') }} di on uc.item_name = di.item_name
 )
-select distinct on(unn_item_category)
-    {{ dbt_utils.generate_surrogate_key(['unn_item_category']) }} item_category_sk,
-    unn_item_category as item_category
-from cte_unnested
+select 
+    item_sk,
+    category_sk,
+    current_timestamp:: TIMESTAMP as created_at
+from cte_historical_item_category s

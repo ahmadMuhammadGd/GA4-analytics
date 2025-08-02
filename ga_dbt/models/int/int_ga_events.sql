@@ -24,7 +24,7 @@ SELECT
     }}
     ,
     {{ 
-        dbt_utils.star(ref('int_ga_events_parameters_flatten'), 
+        dbt_utils.star(ref('int_ga_event_parameters_flatten'), 
         relation_alias='e',
         prefix = 'e_parameter_',
         except=['event_sk', 'source', 'medium', 'page_referrer', 'page_location']) 
@@ -55,7 +55,7 @@ SELECT
 FROM {{ ref("stg_bigquery__ga_events") }} base
 
 LEFT JOIN {{ ref("int_ga_device_info") }} d ON d.event_sk = base.event_sk
-LEFT JOIN {{ ref("int_ga_events_parameters_flatten") }} e ON e.event_sk = base.event_sk
+LEFT JOIN {{ ref("int_ga_event_parameters_flatten") }} e ON e.event_sk = base.event_sk
 {# LEFT JOIN {{ ref("int_ga_items_flatten") }} i ON i.event_sk = base.event_sk #}
 LEFT JOIN {{ ref("int_ga_geo_flatten") }} g ON g.event_sk = base.event_sk
 LEFT JOIN {{ ref("int_ga_traffic_sources") }} t ON t.event_sk = base.event_sk

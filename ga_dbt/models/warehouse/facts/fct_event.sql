@@ -2,8 +2,8 @@ with cte_dim_user as (
     select * from {{ ref('dim_user') }}
 )
 ,
-cte_dim_event_type as (
-    select * from {{ ref('dim_event_type') }}
+cte_dim_event as (
+    select * from {{ ref('dim_event') }}
 )
 ,
 cte_dim_source as (
@@ -37,7 +37,7 @@ cte_fct_construction as (
         fs.session_sk,
         et.event_type_sk,
         s.source_sk,
-        event_timestamp as occurred_at,
+        event_timestamp as event_timestamp,
         event_value_in_usd as value_usd,
         p.page_sk as page_sk,
         rp.page_sk as referral_page_sk,
@@ -53,7 +53,7 @@ cte_fct_construction as (
     left join cte_fct_session as fs
     on fs.ga_session_id is not distinct from e.e_parameter_ga_session_id
 
-    left join cte_dim_event_type as et
+    left join cte_dim_event as et
     on et.event_name = e.event_name
 
     left join cte_dim_source as s

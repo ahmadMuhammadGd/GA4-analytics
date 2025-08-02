@@ -1,6 +1,14 @@
+{% set upstream = ref('stg_bigquery__ga_events') %}
+
+{% if execute %}
+    {% set event_keys = run_query(
+        "select distinct jsonb_array_elements(event_params_json::jsonb) ->> 'key' from " ~ upstream
+    ).columns[0].values() %}
+{% endif %}
+
 WITH cte_source AS (
     SELECT *
-    FROM {{ ref('stg_bigquery__ga_events') }}
+    FROM {{ upstream }}
     {% if is_incremental() %}
     WHERE event_sk NOT IN (
         SELECT event_sk FROM {{ this }}
@@ -18,7 +26,7 @@ cte_to_jsonb_array as (
 cte_flatten as (
     select 
         event_sk,
-        event_params_jsonb ->> 'key'   as event_params_key,
+        event_params_jsonb ->> 'key' as event_params_key,
         coalesce(
             cast(event_params_jsonb ->> 'value' as jsonb)->> 'int_value'    :: text,
             cast(event_params_jsonb ->> 'value' as jsonb)->> 'float_value'  :: text,
@@ -28,7 +36,7 @@ cte_flatten as (
     from cte_to_jsonb_array
 )
 ,
-{% set event_keys = ['page_location', 'page_referrer', 'page_title', 'session_engaged', 'ga_session_id', 'ga_session_number', 'engaged_session_event', 'debug_mode', 'campaign', 'source', 'medium', 'engagement_time_msec'] %}
+
 cte_pivot as (
     SELECT
         event_sk,

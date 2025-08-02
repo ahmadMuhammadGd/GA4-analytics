@@ -13,7 +13,8 @@ cte_fct_construction as (
     select distinct on (e.event_sk, di.item_sk)
         e.event_sk as event_sk,
         di.item_sk as item_sk,
-        null:: int as qty,
+        i.quantity ::int as quantity,
+        i.price ::DECIMAL(10, 2) as price,
         current_timestamp :: timestamp as created_at
     from 
         cte_fct_event e
@@ -23,7 +24,7 @@ cte_fct_construction as (
 
     left join cte_dim_item di
     on di.item_id = i.item_id
-    and e.occurred_at between di.scd_effective_from and di.scd_effective_to
+    and e.event_timestamp between di.scd_effective_from and di.scd_effective_to
 
     where 
         e.event_sk is not null 

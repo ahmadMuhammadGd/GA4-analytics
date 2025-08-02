@@ -1,6 +1,10 @@
+{% set upstream = ref('stg_bigquery__ga_events') %}
+{% if execute %}
+{% set items_column = run_query("select distinct jsonb_object_keys(jsonb_array_elements(items_json::jsonb)) from " ~ upstream).columns[0].values() %}
+{% endif %}
 WITH cte_source AS (
     SELECT *
-    FROM {{ ref('stg_bigquery__ga_events') }}
+    FROM {{ upstream }}
     {% if is_incremental() %}
     WHERE event_sk NOT IN (
         SELECT event_sk FROM {{ this }}
@@ -15,7 +19,6 @@ cte_array_flat as (
 )
 ,
 cte_json_flat as (
-    {% set items_column = ['affiliation', 'coupon', 'creative_name', 'creative_slot', 'item_brand', 'item_category', 'item_category2', 'item_category3', 'item_category4', 'item_category5', 'item_id', 'item_list_id', 'item_list_index', 'item_list_name', 'item_name', 'item_refund', 'item_refund_in_usd', 'item_revenue', 'item_revenue_in_usd', 'item_variant', 'location_id', 'price', 'price_in_usd', 'promotion_id', 'promotion_name', 'quantity'] %}
     select 
         event_sk,
         {% for column in items_column %}
